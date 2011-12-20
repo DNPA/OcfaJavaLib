@@ -1,0 +1,103 @@
+<project name="OcfaJavaLib" basedir="../" default="all">
+
+	<!-- taskdef name="pack" classname="org.sadun.util.ant.Pack"
+	   classpath="lib/pack.jar"/ -->
+    <!-- Project settings -->
+    <property name="project.distname" value="OcfaJavaLib"/>
+
+    <!-- Local system paths -->
+    <property file="${basedir}/ant/build.properties"/>
+    <property name="build.dir" value="build"/>
+	<property name="lib.dir" value="lib"/>
+	<property name="OcfaJavaLib.jar" value="OcfaJavaLib.jar"/>
+   
+
+    <path id="compile.classpath">
+     
+        <pathelement path="${classpath.external}"/>
+        <pathelement path="${classpath}"/>
+
+    	<pathelement path="${lib.dir}/postgresql-8.1-404.jdbc3.jar" />
+        <pathelement path="${lib.dir}/commons-logging.jar" />
+        <pathelement path="${lib.dir}/commons-dbcp-1.2.2.jar" />
+        <pathelement path="${lib.dir}/commons-pool-1.3.jar" />
+	<pathelement path="${lib.dir}/log4j-1.2.8.jar" />
+        <pathelement path="${lib.dir}/junit-4.5.jar" />
+
+    </path>
+
+    <!-- define your folder for deployment -->
+    <property name="ocfaroot.dir" value="/usr/local/digiwash" />
+    <property name="deploy.dir" value="${ocfaroot.dir}/lib"/>
+ 
+
+
+    <!-- Check timestamp on files -->
+    <target name="prepare">
+        <tstamp/>
+    </target>
+    <!-- Normal build of application -->
+    <target name="compile" depends="prepare">
+       <mkdir dir="${build.dir}" />
+        <mkdir dir="${build.dir}/classes" />
+        <javac srcdir="src" destdir="${build.dir}/classes" debug="true" target="1.5" >
+            <classpath refid="compile.classpath"/>
+        </javac>
+        <copy file="src/log4j.properties" todir="${build.dir}/classes"  />
+
+    </target>
+
+    <!-- Remove classes directory for clean build -->
+    <target name="clean"
+      description="Prepare for clean build">
+      <delete dir="${build.dir}/classes"/>
+      <mkdir  dir="${build.dir}/classes"/>
+    </target>
+
+    <!-- Build entire project -->
+    <target name="build" depends="prepare,compile"/>
+    <target name="rebuild" depends="clean,prepare,compile"/>
+
+
+
+   
+	<target name="jar" depends="prepare,compile">
+	  <mkdir dir="${build.dir}" />
+      <echo message="jarring to ${build.dir}/${OcfaJavaLib.jar}" />
+      <jar manifest="ant/manifest"
+      	 basedir="${build.dir}/classes" destfile="${build.dir}/${OcfaJavaLib.jar}">
+      	  
+      	<zipfileset src="${lib.dir}/postgresql.jar" />
+        <zipfileset src="${lib.dir}/commons-logging.jar" />     	
+      	 <zipfileset src="${lib.dir}/commons-dbcp-1.2.2.jar" />
+      	 <zipfileset src="${lib.dir}/commons-pool-1.3.jar" />
+
+      	 <zipfileset src="${lib.dir}/log4j-1.2.8.jar" />
+
+      	</jar>
+	</target>
+    <target name="deploy" depends="jar">
+    	<mkdir dir="${deploy.dir}" />
+       
+  
+       <copy file="${build.dir}/${OcfaJavaLib.jar}" todir="${deploy.dir}"/>
+       <copy file="${basedir}/src/log4j.properties" todir="${ocfaroot.dir}/etc" />
+       <!-- copy file="${lib.dir}/lucene-core-2.2.0.jar" todir="${deploy.dir}"/>
+       <copy file="${lib.dir}/postgresql-8.1-404.jdbc3.jar" todir="${deploy.dir}" />
+       <copy file="${lib.dir}/commons-logging.jar" todir="${deploy.dir}" />
+    	<copy file="${lib.dir}/log4j-1.2.8.jar" todir="${deploy.dir}" /-->
+    </target>
+    <target name="all" depends="compile, jar" />
+	
+	<!-- target name="pack" depends="compile"></target>
+	<pack classes="nl.klpd.tde.duif.configtool.gui.DuifConfigFrame" targetJar="configtool.jar"
+		manifestMainClass="nl.klpd.tde.duif.configtool.gui.DuifConfigFrame">
+		<classpath>
+			<path refid="compile.classpath"/>
+			<pathelement path="${build.dir}/classes"/>
+		</classpath>
+	    <additionalfileset dir="${build.dir}">
+	      <include name="postgresql-8.1-404.jdbc3.jar,commons-logging.jar,log4j-1.2.8.jar,lucene-core-2.2.0.jar,commons-dbcp-1.2.2.jar"/>
+	    </additionalfileset>	
+</pack-->
+</project>
