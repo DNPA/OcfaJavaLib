@@ -42,11 +42,12 @@ public class MonitorModule extends OcfaModule {
 	public void loadLibraries(String [] inLibraries){
 
 		String ocfaRoot;
-		if (System.getenv("OCFAROOT") != null){
-			ocfaRoot = System.getenv("OCFAROOT");
-		} else {
-			ocfaRoot = "/usr/local/digiwash/";
-		}
+//		if (System.getenv("OCFAROOT") != null){
+//			ocfaRoot = System.getenv("OCFAROOT");
+//		} else {
+//			ocfaRoot = "/usr/local/digiwash/";
+//		}
+		ocfaRoot = getConfig().getProperty("ocfaroot");
 		URL [] urls  = new URL[inLibraries.length];
 		try {
 			for (int x = 0; x < inLibraries.length; x++){
